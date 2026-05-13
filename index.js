@@ -4,28 +4,30 @@ const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
 
-const VERIFY_TOKEN = "AiArtHub_123"; // same token Meta me daalna
+const VERIFY_TOKEN = "AiArtHub_123";
 
-// ✅ Webhook Verify (GET)
+// ✅ FIX: Root route add
+app.get("/", (req, res) => {
+  res.send("Server is running 🚀");
+});
+
+// ✅ Webhook verify
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode && token) {
-    if (mode === "subscribe" && token === VERIFY_TOKEN) {
-      console.log("WEBHOOK VERIFIED");
-      return res.status(200).send(challenge);
-    } else {
-      return res.sendStatus(403);
-    }
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    console.log("Webhook Verified!");
+    return res.status(200).send(challenge);
+  } else {
+    return res.sendStatus(403);
   }
 });
 
-// ✅ Webhook Receive (POST)
+// ✅ Webhook receive
 app.post("/webhook", (req, res) => {
-  console.log("Incoming webhook:", JSON.stringify(req.body, null, 2));
-
+  console.log("Webhook Data:", JSON.stringify(req.body, null, 2));
   res.status(200).send("EVENT_RECEIVED");
 });
 
